@@ -2438,7 +2438,7 @@ int input_read_parameters(
   class_read_double("log10_G_eff_nu",pba->log10_G_eff_nu);
 
   // DC: Minimum threshold for LCDM limit. Excessively low values could produce numerical issues.
-  if (pba->log10_G_eff_nu < -6.){
+  if (pba->log10_G_eff_nu < -12.){
     pba->G_eff_nu=0.;
   }
   else {
@@ -2497,7 +2497,7 @@ int input_read_parameters(
     /*  Here we read the stuff from the .ini file */
 
   class_call(parser_read_string(pfc,
-                                "non linear",
+                                "non_linear",
                                 &(string1),
                                 &(flag1),
                                 errmsg),
@@ -2543,7 +2543,7 @@ int input_read_parameters(
     }
 
 
-    class_call(parser_read_string(pfc, "FFTLog mode",&(string1),&(flag1),errmsg), errmsg,errmsg);
+    class_call(parser_read_string(pfc, "FFTLog_mode",&(string1),&(flag1),errmsg), errmsg,errmsg);
 
     if (flag1 == _TRUE_){
       if ((strstr(string1,"Fast") != NULL) || (strstr(string1,"FAST") != NULL) || (strstr(string1,"F") != NULL)) {
