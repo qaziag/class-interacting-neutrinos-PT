@@ -7797,6 +7797,7 @@ int perturb_derivs(double tau,
   double tau_nu,tau_ur,tau_ncdm;
   double tca_shear_ur,tca_psi2_ncdm1;
   int index_ikout;
+  int l_max_ur_int=17;
 
   /** - rename the fields of the input structure (just to avoid heavy notations) */
 
@@ -8452,22 +8453,50 @@ int perturb_derivs(double tau,
                 - ppt->alpha_ell[l]*y[pv->index_pt_l3_ur]/tau_ur;
 
               /** - -----> exact ur l>3 */
-              for (l = 4; l < pv->l_max_ur; l++) {
-                // printf("alpha_%i %.8f\n",l,ppt->alpha_ell[l]);      
-                dy[pv->index_pt_delta_ur+l] = k/(2.*l+1)*
-                  (l*s_l[l]*y[pv->index_pt_delta_ur+l-1]-(l+1.)*s_l[l+1]*y[pv->index_pt_delta_ur+l+1])
+              if (pv->l_max_ur<l_max_ur_int){
+
+                for (l = 4; l < pv->l_max_ur; l++) {
+                  // printf("alpha_%i %.8f\n",l,ppt->alpha_ell[l]);      
+                  dy[pv->index_pt_delta_ur+l] = k/(2.*l+1)*
+                    (l*s_l[l]*y[pv->index_pt_delta_ur+l-1]-(l+1.)*s_l[l+1]*y[pv->index_pt_delta_ur+l+1])
+                    // neutrino interaction term
+                    - ppt->alpha_ell[l]*y[pv->index_pt_delta_ur+l]/tau_ur;
+                }
+
+                /** - -----> exact ur lmax_ur */
+                l = pv->l_max_ur;
+                dy[pv->index_pt_delta_ur+l] =
+                  k*(s_l[l]*y[pv->index_pt_delta_ur+l-1]-(1.+l)*cotKgen*y[pv->index_pt_delta_ur+l])
                   // neutrino interaction term
                   - ppt->alpha_ell[l]*y[pv->index_pt_delta_ur+l]/tau_ur;
-                // printf("l: %i, standard term %.8f\n",l,k/(2.*l+1)*(l*s_l[l]*y[pv->index_pt_delta_ur+l-1]-(l+1.)*s_l[l+1]*y[pv->index_pt_delta_ur+l+1]));      
-                // printf("l: %i, interaction term %.8f\n",l,- ppt->alpha_ell[l]*y[pv->index_pt_delta_ur+l]/tau_ur);      
-              }
 
-              /** - -----> exact ur lmax_ur */
-              l = pv->l_max_ur;
-              dy[pv->index_pt_delta_ur+l] =
-                k*(s_l[l]*y[pv->index_pt_delta_ur+l-1]-(1.+l)*cotKgen*y[pv->index_pt_delta_ur+l])
-                // neutrino interaction term
-                - ppt->alpha_ell[l]*y[pv->index_pt_delta_ur+l]/tau_ur;
+              }
+              else{
+                /** Coliision term becomes constant at l_max_ur_int*/
+                for (l = 4; l < l_max_ur_int; l++) {
+                  // printf("alpha_%i %.8f\n",l,ppt->alpha_ell[l]);      
+                  dy[pv->index_pt_delta_ur+l] = k/(2.*l+1)*
+                    (l*s_l[l]*y[pv->index_pt_delta_ur+l-1]-(l+1.)*s_l[l+1]*y[pv->index_pt_delta_ur+l+1])
+                    // neutrino interaction term
+                    - ppt->alpha_ell[l]*y[pv->index_pt_delta_ur+l]/tau_ur;
+                }
+
+                for (l = l_max_ur_int; l <  pv->l_max_ur; l++) {
+                  // printf("alpha_%i %.8f\n",l,ppt->alpha_ell[l]);      
+                  dy[pv->index_pt_delta_ur+l] = k/(2.*l+1)*
+                    (l*s_l[l]*y[pv->index_pt_delta_ur+l-1]-(l+1.)*s_l[l+1]*y[pv->index_pt_delta_ur+l+1])
+                    // neutrino interaction term
+                    - ppt->alpha_ell[l_max_ur_int]*y[pv->index_pt_delta_ur+l]/tau_ur;
+                }
+
+                /** - -----> exact ur lmax_ur */
+                l = pv->l_max_ur;
+                dy[pv->index_pt_delta_ur+l] =
+                  k*(s_l[l]*y[pv->index_pt_delta_ur+l-1]-(1.+l)*cotKgen*y[pv->index_pt_delta_ur+l])
+                  // neutrino interaction term
+                  - ppt->alpha_ell[l_max_ur_int]*y[pv->index_pt_delta_ur+l]/tau_ur;
+
+              }
 
             }
 
